@@ -2,7 +2,7 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
 use near_sdk::{env, near_bindgen};
 
-near_sdk::setup_alloc!();
+// near_sdk::setup_alloc!();
 
 #[cfg(target_arch = "wasm32")]
 #[global_allocator]
