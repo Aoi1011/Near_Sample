@@ -80,4 +80,12 @@ mod tests {
             contract.read("first_key".to_string()).unwrap()
         );
     }
+
+    #[test]
+    fn read_nonexistent_pair() {
+        let context = get_context(vec![], true);
+        testing_env!(context);
+        let contract = KeyValue::default();
+        assert_eq!(None, contract.read("first_key".to_string()));
+    }
 }
