@@ -238,8 +238,7 @@ mod tests {
             .storage_usage(env::storage_usage())
             .attached_deposit(MINT_STORAGE_COST)
             .predecessor_account_id(accounts(0))
-            .build()
-        );
+            .build());
 
         let token_id = "0".to_string();
         contract.nft_mint(token_id.clone(), accounts(0), sample_token_metadata());
@@ -248,8 +247,7 @@ mod tests {
             .storage_usage(env::storage_usage())
             .attached_deposit(150000000000000000000)
             .predecessor_account_id(accounts(0))
-            .build()
-        );
+            .build());
 
         contract.nft_approve(token_id.clone(), accounts(0), None);
 
@@ -257,8 +255,7 @@ mod tests {
             .storage_usage(env::storage_usage())
             .attached_deposit(1)
             .predecessor_account_id(accounts(0))
-            .build()
-        );
+            .build());
         contract.nft_revoke(token_id.clone(), accounts(1));
 
         testing_env!(context
@@ -266,17 +263,45 @@ mod tests {
             .account_balance(env::account_balance())
             .is_view(true)
             .attached_deposit(0)
-            .build()
-        );
+            .build());
         assert!(!contract.nft_is_approved(token_id.clone(), accounts(1), None));
     }
-}
 
-#[cfg(test)]
-mod tests {
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn test_revoke_all() {
+        let mut context = get_context(accounts(0));
+        testing_env!(context.build());
+        let mut contract = Contract::new_default_meta(accounts(0).into());
+
+        testing_env!(context
+            .storage_usage(env::storage_usage())
+            .attached_deposit(MINT_STORAGE_COST)
+            .predecessor_account_id(accounts(0))
+            .build());
+        let token_id = "0".to_string();
+        contract.nft_mint(token_id.clone(), accounts(0), sample_token_metadata());
+
+        testing_env!(context
+            .storage_usage(env::storage_usage())
+            .attached_deposit(150000000000000000000)
+            .predecessor_account_id(accounts(0))
+            .build());
+        contract.nft_approve(token_id.clone(), accounts(1), None);
+
+        testing_env!(context
+            .storage_usage(env::storage_usage())
+            .attached_deposit(1)
+            .predecessor_account_id(accounts(0))
+            .build());
+        contract.nft_approve(token_id.clone(), accounts(1), None);
+
+        testing_env!(context
+            .storage_usage(env::storage_usage())
+            .account_balance(env::account_balance())
+            .is_view(true)
+            .attached_deposit(0)
+            .build());
+
+        assert!(!contract.nft_is_approved(token_id.clone(), accounts(1), Some(1)));
     }
 }
