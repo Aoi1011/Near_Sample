@@ -11,6 +11,9 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 near-sdk = "3.1.0"
 
+fungible-token = { path = "./ft" }
+
+
 [profile.release]
 codegen-units = 1
 
@@ -19,3 +22,8 @@ lto = true
 debug = false
 panic = "abort"
 overflow-checks = true
+
+[workspace]
+members = [
+    "ft"
+]
