@@ -37,6 +37,7 @@ impl Contract {
         )
     }
 
+    #[init]
     pub fn new(
         owner_id: ValidAccountId,
         total_supply: U128,
