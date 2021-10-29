@@ -75,3 +75,12 @@ impl FungibleTokenReceiver for DeFi {
         }
     }
 }
+
+#[near_bindgen]
+impl ValueReturnTrait for DeFi {
+    fn value_please(&self, amount_to_return: String) -> PromiseOrValue<U128> {
+        log!("in value_please, amount_to_return = {}", amount_to_return);
+        let amount: Balance = amount_to_return.parse().expect("Not an integer");
+        PromiseOrValue::Value(amount.into())
+    }
+}
