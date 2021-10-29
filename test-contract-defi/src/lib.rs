@@ -49,7 +49,7 @@ impl FungibleTokenReceiver for DeFi {
         msg: String,
     ) -> PromiseOrValue<U128> {
         assert_eq!(
-            *env::predecessor_account_id(),
+            &env::predecessor_account_id(),
             &self.fungible_token_account_id,
             "Only supports the one fungible token contract"
         );
