@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 near-sdk = "3.1.0"
 
 fungible-token = { path = "./ft" }
+defi = { path = "./test-contract-defi" }
 
 
 [profile.release]
@@ -25,5 +26,6 @@ overflow-checks = true
 
 [workspace]
 members = [
-    "ft"
+    "ft", 
+    "test-contract-defi"
 ]
