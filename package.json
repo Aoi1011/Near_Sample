@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Aoi1011/Near_Sample#readme",
   "devDependencies": {
+    "git-cz": "^4.8.0",
     "near-cli": "^2.1.1"
   }
 }
