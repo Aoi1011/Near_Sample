@@ -53,6 +53,14 @@ impl Contract {
             .internal_deposit(owner_id.as_ref(), total_supply.into());
         this
     }
+
+    pub fn on_account_closed(&mut self, accout_id: AccountId, balance: Balance) {
+        log!("Closed @{} with {}", accout_id, balance);
+    }
+
+    pub fn on_tokens_burned(&mut self, accout_id: AccountId, amount: Balance) {
+        log!("Account @{} burned {}", accout_id, amount);
+    }
 }
 
 #[cfg(test)]
