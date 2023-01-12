@@ -1,3 +1,4 @@
+mod addr;
 mod elliptic_curve;
 
 use bitcoincore_rpc::{bitcoin::Txid, Auth, Client, RpcApi};
