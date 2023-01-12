@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 bitcoincore-rpc = "0.16.0"
+primitive-types = "0.1.0"
