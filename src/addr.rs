@@ -19,7 +19,7 @@ pub fn create_address() {
     let secp = Secp256k1::preallocated_new(buf.as_mut_slice()).unwrap();
 
     let root = ExtendedPrivKey::new_master(network, &seed).unwrap();
-    println!("Root key: {root}");
+    println!("Root key: {}", root);
 
     let path = DerivationPath::from_str("m/84h/0h/0h").unwrap();
     let child = root.derive_priv(&secp, &path).unwrap();

@@ -1,11 +1,13 @@
 mod addr;
 mod elliptic_curve;
+mod key_to_address;
 
 use addr::create_address;
 use bitcoincore_rpc::{bitcoin::Txid, Auth, Client, RpcApi};
+use key_to_address::key_to_address;
 
 fn main() {
-    create_address();
+    key_to_address();
 }
 
 fn rpc_example() {
