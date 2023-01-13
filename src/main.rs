@@ -1,9 +1,12 @@
 mod addr;
 mod elliptic_curve;
 
+use addr::create_address;
 use bitcoincore_rpc::{bitcoin::Txid, Auth, Client, RpcApi};
 
-fn main() {}
+fn main() {
+    create_address();
+}
 
 fn rpc_example() {
     let rpc = Client::new(
