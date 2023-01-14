@@ -8,6 +8,7 @@ use key_to_address::key_to_address;
 
 fn main() {
     key_to_address();
+    rpc_example();
 }
 
 fn rpc_example() {
@@ -19,10 +20,11 @@ fn rpc_example() {
 
     let best_block_hash = rpc.get_blockchain_info().unwrap();
     println!("best block hash: {}", best_block_hash.blocks);
+
 }
 
-fn rpc_transaction() {
-    let rpc = Client::new(
+pub fn rpc_transaction() {
+    let _rpc = Client::new(
         "http://127.0.0.1:18332",
         Auth::UserPass("alice".to_string(), "alicepassword".to_string()),
     )
