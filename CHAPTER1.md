@@ -1,11 +1,13 @@
 # What is Ethereum?
 
+
 ## Compared to Bitcoin
 Ethereum shares many common elements with other open blockchains: a peer to peer network connecting participants, a Byzantine fault-tolerant consensus algorithm for synchronization of state updates, the use of cryptographic primitives such as digital signatures and hashes, and digital curency. 
 
 Ethereum's purpose is not primarily to be a digital currency ayment network. While the digital currency ether is both integral to and necessary for the operation of Ethereum, ether is intended as a utility currency to pay for use of the Ethreum platform as the world computer. 
 
 Ethereum is designed to be a general-purpose programmable blockchain that runs a virtual machine capable of executing code of arbitrary and unbounded complexity. Ethereum's language is Turing complete, meaning that Ethereum can straightforwardly function as a general-purpose computer. 
+
 
 ## Components of a Blockchain
 - A P2P network connecting participants and propagating txs and blocks of verified txs, based on a standardized "gossip" protocol. 
@@ -19,17 +21,21 @@ Ethereum is designed to be a general-purpose programmable blockchain that runs a
 
 open, public, global, decentralized, neutral, and censorship-resistant
 
+
 ## The Birth of Ethereum
 Developers faced a conundrum: they either needed to build on top of Bitcoin or start a new blockchain. 
 
 Could support a broad variety of applications by being programmed. 
 
+
 ## Ethereum's Four Stages of Development
 "hard forks" - change functionality in a way that is not backward compatible
+
 
 ## Ethereum: A General-Purpose Blockchain
 Ethereum is also a distributed state machine. Ethereum tracks the state transitions of a general-purpose data store, a store that can hold any data expressible as a *key-value* tuple. 
 Ethereum has memory that stores both code and data, and it uses the Ethereum blockchain to track how this memory changes into its state machine and run that code, storing the resulting state changes in its blockchain. 
+
 
 ## Ethereum's Components
 - P2P network
@@ -54,5 +60,16 @@ POS
 - Clients
 Client software, Go-Ethereum and Parity
 
+
+## Ethereum and Turing Completeness
+Ethereum's ability to execute a stored program, in a state machine called the Ethereum Virtual Machine, while reading and writing data to memory makes it a Turing-compelte system adn therefore a UTM(Universal Turing Machine). 
+
+### Turing Completeness as a "Feature"
+Turing completeness is very dangerous, particularly in open access systems like public blockchain, because of the halting problem we touched on earlier. 
+
+### Implications of Turing Completeness
+As Turing proved, Ethereum can't predict if a smart contract will terminate, or how long it will run, without actually running it (possibly running forever). 
+
+Ethereum introduces 
 
 
