@@ -29,4 +29,40 @@ Externally owned accounts are those that have a private key; having the private 
 2. contract account
 A contract account has smart contract code, which a simple EOA can't have. A contract account does not have a private key. Instead, it is owned (and controlled) by the logic of its smart contract code: the software program recorded on the Ethereum blockchain at the contract account's creation and executed by the EVM. 
 
+Contracts have addresses, just like EOAs. Contracts can also send and receive ether, just like EOAs. However, when a tx destination is a contract address, it causes that contract to run in the EVM, using the transaction, and the transaction's data, as its input. 
+
+A contract account does not have a private key, it cannot initiate a transaction. Only EOAs can initiate txs, but contracts can react to transactions by calling other contracts, building complex execution paths. 
+
+## A simple contract: A test ehter faucet
+
+```solidity
+// our first contract is a faucet!
+contract Faucet {
+	function withdraw(uint withdraw_amount) public {
+		// Limit withdrawal amount
+		require(withdraw_amount <= 10000000000000);
+
+		// Send the amount to the address that requested it
+		msg.sender.transfer(withdraw_amount);
+	}
+
+	// Accept any incoming amount
+	function() public payable {}
+}
+```
+
+Comments are for humans to read and are not included in the executable EVM byte-code. 
+
+
+## Compiling the Faucet Contract
+We need to use a Solidity compiler to convert the Solidity code into EVM bytecode so it can be executed by the EVM on the blockchain itself.
+
+
+## Creating the Contract on the Blockchain
+contact -> compile -> bytecode -> register the contract on the Ethereum blockchain.
+
+
+## Interacting with the Contract
+
+### Viewing the Contract Address in a Block Explorer
 
