@@ -70,6 +70,22 @@ Turing completeness is very dangerous, particularly in open access systems like 
 ### Implications of Turing Completeness
 As Turing proved, Ethereum can't predict if a smart contract will terminate, or how long it will run, without actually running it (possibly running forever). 
 
-Ethereum introduces 
+Ethereum introduces a metering mechanism called gas. As the EVM executes a smart contract, it carefully accounts for every instruction(computation, data access, etc.). 
 
+
+## From General-Purpose Blockchains to Decentralized Applications
+Ethereum started as a way to make a general-purpose blockchain that could be programmed for a variety of uses. 
+
+A DApp is composed of at least:
+- A smart contracts on a blockchain
+- A web frontend user interface
+
+In addition, many DApps include other decentralized components, such as:
+- A decentralized (P2P) storage protocol and platform
+- A decentralized (P2P) messaging protocol and platform
+
+## Ethereum's Development Culture
+The community's development culture is focused on the future rather than the past. The mantra is "move fast and break things."
+
+## Why Learn Ethereum?
 
