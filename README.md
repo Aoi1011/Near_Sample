@@ -13,6 +13,19 @@ PoPos protocol requires each prover to organize its claimed sequence of committe
 Solana
 we can get the pubkey who votes by [`getVotesAccounts`](https://solana.com/docs/rpc/http/getvoteaccounts)
 
+```
+curl "https://mainnet.helius-rpc.com/?api-key=ff28efe6-4fe6-4cf5-9525-01adeed6ee0b" -X POST -H "Content-Type: application/json" -d '
+                                {
+                                  "jsonrpc": "2.0",
+                                  "id": 2,
+                                  "method": "getVoteAccounts",
+                                  "params": [
+
+                                  ]
+                                }
+                              ' | jq
+```
+
 ## What is RPC?
 RPC stands for Retemo Procedure Call. These are nodes that participate in the blockchain network and expose methods.
 
