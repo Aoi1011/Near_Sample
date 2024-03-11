@@ -26,6 +26,18 @@ curl "https://mainnet.helius-rpc.com/?api-key=ff28efe6-4fe6-4cf5-9525-01adeed6ee
                               ' | jq
 ```
 
+## Epochs and Scheduling
+Solana's leader schedule and epoch structure would need to be considered. Solana epochs have a fixed duration, and leaders (validators) are scheduled to write to the ledger in advance. An adaptation of the concept might involve creating Merkle trees for Solana's epochs, but the specific implementation would need to consider Solana's rapid block production and confirmation times.
+
+## Validator Selection and Stake
+Solana's consensus mechanism already incorporates stake-weighted voting, but the specifics of how validators are chosen and how stake influences consensus might affect how a bisection game or similar mechanism could be implemented.
+
+## Proof of History Integration
+Any implementation would need to consider how Proof of History, Solana's unique timekeeping mechanism, interacts with these proofs. PoH provides a way to verify the passage of time between two events, which could potentially be leveraged or need to be accounted for in a sublinear complexity proof system.
+
+## Network and Performance Characteristics
+Solana is designed for high throughput and low latency, with different network and performance characteristics than Ethereum. Any implementation would need to ensure that the additional complexity of sublinear proofs doesn't negatively impact these performance metrics.
+
 Prover/Verifier model
 The full nodes are trying to convince the light client of the system's state. In this context, the light client is known as the verifier and the full nodes  are known as the provers. 
 
