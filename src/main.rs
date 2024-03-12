@@ -3,6 +3,8 @@ use dotenv::dotenv;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use tokio::net::TcpListener;
 
+const BLOCK_LIMIT: u64 = 500_000;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
@@ -10,7 +12,7 @@ async fn main() -> anyhow::Result<()> {
 
     let rpc_client = RpcClient::new(url);
 
-    // let block = rpc_client.get_block(1).await.expect("get block");
+    let latest_slot = rpc_client.get_slot().await.expect("get slot");
 
     // let vote_accounts = rpc_client
     //     .get_vote_accounts()
@@ -21,9 +23,34 @@ async fn main() -> anyhow::Result<()> {
 
     let start_slot = 0;
     let limit = 3;
-    let confirmed_blocks = rpc_client.get_blocks(start_slot, Some(500_000)).await.context("")?;
+    let mut rewards = Vec::new();
 
-    eprintln!("Got Confirmed blocks, the length is {}", confirmed_blocks.len());
+    loop {
+        let end_slot = start_slot + BLOCK_LIMIT;
+
+        let confirmed_blocks = rpc_client
+            .get_blocks(start_slot, Some(end_slot))
+            .await
+            .context("get confirmed blocks")?;
+
+        eprintln!(
+            "Got Confirmed blocks, the length is {}",
+            confirmed_blocks.len()
+        );
+
+        for confimed_blockn in confirmed_blocks {
+            let confirmed_block = rpc_client
+                .get_block(confimed_blockn)
+                .await
+                .context("get confirmed blocks")?;
+
+            rewards.push(confirmed_block.rewards);
+        }
+
+        if end_slot > latest_slot {
+            break;
+        }
+    }
 
     // let block = rpc_client.get_block(0).await.context("get block")?;
 
