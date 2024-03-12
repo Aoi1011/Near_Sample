@@ -1,7 +1,15 @@
 # Lantern
 
-Papaer
-- [Proofs of Proof-of-Stake with Sublinear Complexity](https://arxiv.org/pdf/2209.08673.pdf)
+## Epoch
+
+Each each epoch is 432,000 slots, if the slot number is divisible by 432,000, the it's at the boundary.
+
+https://solana.stackexchange.com/questions/10382/whats-the-best-way-to-listen-for-epoch-updates
+
+## Leader
+
+`getSlotLeaders` keeps only 10 epochs worth of [schedules](https://github.com/anza-xyz/agave/blob/3863bb1bdf0f7c9a0b35c2c19dc50943ca39657e/ledger/src/leader_schedule_cache.rs#L22).
+So instead of this endpoint, we will use `getBlock` endpoint with `rewards: true`
 
 Optimistic light client
 For each committee, take its members, concatencate them all together, and hash them into on hash. 
