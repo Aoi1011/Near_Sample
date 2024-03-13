@@ -5,25 +5,33 @@
 - The verifier enrolls the provers in a bisection game, in which honest provers are destined to win once an adversarial Merkle tree is challenged at sufficient depth.
 - Promises both efficiency and decentralization by achieving logarithmic bootstrapping complexity. This is achieved through a novel construction using a Merkle tree of PoS epochs and engaging provers in a bisection game, where honest provers can prevail against adversarial attempts at deception when the Merkle tree is sufficiently challenged.
 
-## Introduction
+## 1. Introduction
 - Efficiently verifying the proof-of-stake blockchain without downloading the whole PoS. -> proofs of proof of stake
 
-## Construction Overview
+### 1.1 Construction Overview
 
-### Full nodes
+#### Full nodes
 - A *full node* client boots holding only the genesis block and connects to other full nodes (known as provers) in order to synchronize to the latest tip. 
 - The full node downloads the entire chain block-by-block verifying each transaction in the process.
 - Once the client verifies the latest tip, it has calculated the latest state and can answer user queries such as "What is my balance?". 
 
-### Sync committees
+#### Sync committees
 - PoS protocols typically proceed in epochs during which the validator set is fixed.
 - In each epoch, a subset of validators is elected by the protocol as the epoch committee.
 - The current committee signs the latest state. Therefore, the client does not need to download all the blocks, but instead only needs to download the latest state and verify the committee signatures on it.
 - To perform the verification at some later epoch, the client needs to keep track of the current committee.
 
-### Optimistic light client construction
+#### Optimistic light client construction
 - For each committee, take its members concatenate them all togerther, and hash them into one hash.
 - The prover then sends this sequence of hashes (one for each committee) to the client. 
+- If multiple provers five conflicting claims to the client, all  it needs to do is to find which one is truthful.
+- If two provers disagree, the client focuses on the first point of disagreement in their hash sequences, and asks each prover to provide the respective handover signatures to substantiate their claims.
+
+#### Superlight clients
+- To achieve sublinear complexity, we improve the procedure to find the first point of disagreement.
+- To this end, our final PoPos protocol rquires each prover to organize its claimed sequence of committees - one per epoch - into a merkle tree.
+
+
 
 ## Proof of Stake (PoS) superlight client
 
@@ -33,6 +41,15 @@ In a PoS blockchain, time is divided into epochs, which are periods during which
 2. Bisection Game
 This is a strategy to efficiently verify information. If a light client wants to verify the state of the blockchain at a specific epoch, it can challenge a prover (a full node) to provide proof. If the prover is dishonest, the light client can engage in a "bisection" process, where it asks the prover to provide proof for smaller and smaller intervals until it either finds a discrepancy or narrows down the interval to a point where it can directly verify the truth. Honest provers can quickly provide valid proofs, while dishonest ones are caught in their deception.
 
+
+## Note
+
+**difference between a full node and a validator**
+
+Validators are nodes that are staked with SOL tokens and are responsible for validating transactions and blocks, voting on every block to ensure network security. Full nodes include nodes that are not staked and are responsible for serving the network to clients. As every node, staked or otherwise, maintains a full copy of the ledger, the security of the network is not dependent on the number of validators alone: any full node can be used to recover the state in case of a catastrophic failure.
+
+**How a new validator get last state in Solana?**
+https://solana.stackexchange.com/questions/2396/how-a-new-validator-get-last-state-in-solana
 
 Papaer
 - [Proofs of Proof-of-Stake with Sublinear Complexity](https://arxiv.org/pdf/2209.08673.pdf)
