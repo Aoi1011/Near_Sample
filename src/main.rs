@@ -3,7 +3,7 @@ use dotenv::dotenv;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use tokio::net::TcpListener;
 
-const BLOCK_LIMIT: u64 = 500_000;
+const ONE_EPOCH: u64 = 432_000;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
     let mut rewards = Vec::new();
 
     loop {
-        let end_slot = start_slot + BLOCK_LIMIT;
+        let end_slot = start_slot + ONE_EPOCH;
 
         let confirmed_blocks = rpc_client
             .get_blocks(start_slot, Some(end_slot))
@@ -44,7 +44,8 @@ async fn main() -> anyhow::Result<()> {
                 .await
                 .context("get confirmed blocks")?;
 
-            rewards.push(confirmed_block.rewards);
+            let leader_pubkeys = confirmed_block.rewards.iter().map(|r| r.pubkey).collect();
+            
         }
 
         if end_slot > latest_slot {

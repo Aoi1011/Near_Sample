@@ -32,6 +32,41 @@
 - To this end, our final PoPos protocol rquires each prover to organize its claimed sequence of committees - one per epoch - into a merkle tree.
 
 
+## 2. Preliminaries
+
+**Proof-of-stake**
+It is assumed that the majority of stake is honestly controlled at every point in time
+
+**Primitives**
+
+**Types of nodes**
+
+validators 
+- The stakeholders who participate in maintaining the system's consensus
+
+full nodes
+- do not participate in maintaining consensus, can join the system, download its full history, and discover its current state.
+
+light clients
+- insterested in joining the system and learning a small part of the sytem state (such as their user's balance) without downloading everything
+
+**Time**
+The protocol execution proceeds in discrete epochs.
+Epochs are further subdivided into rounds, which correspond to shorter time durations during which a message sent by one honest party is  received by all others
+
+**The prover/verifier model**
+The bootstrapping process begins with a light client connecting to its full node peers to begin synchrnizing
+the light client is known as the *verifier*
+the full nodes are known as the *provers*
+
+## 3. The PoPoS Primitive
+
+
+## 4. The Optimistic Light Client
+
+**Sync committees**
+
+
 
 ## Proof of Stake (PoS) superlight client
 
