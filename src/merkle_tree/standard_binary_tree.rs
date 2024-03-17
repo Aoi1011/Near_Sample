@@ -53,7 +53,7 @@ impl MerkleTree {
 
     /// Builds the Merkle tree from a list of leaves. In case of an odd number of leaves, the last
     /// leaf is duplicated.
-    fn build(&mut self, leaves: &mut [MerkleNode]) -> bool {
+    fn build(&mut self, leaves: &mut [MerkleNode] ) -> bool {
         let nleaves = leaves.len();
         if nleaves == 1 {
             if let Some(leaf) = leaves.get(0) {
@@ -197,7 +197,7 @@ mod tests {
     fn test_get_audit_trail() {
         let tree = construct_merkletree();
 
-        let hash = <Sha256 as Digest>::digest("2");
+        let hash = <Sha256 as Digest>::digest("0");
         let res = hex::encode(hash);
 
         let audit_trail = tree.get_audit_trail(res);
