@@ -1,9 +1,9 @@
-use std::rc::Rc;
+use std::{io, rc::Rc};
 
 use sha2::{Digest, Sha256};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct MerkleNode {
+pub struct MerkleNode {
     hash: String,
     parent: Option<Box<MerkleNode>>,
     left_child: Option<Box<MerkleNode>>,
@@ -26,6 +26,7 @@ impl MerkleNode {
 pub struct MerkleTree {
     root: MerkleNode,
     leaves: Vec<MerkleNode>,
+    layers: Vec<Vec<MerkleNode>>,
 }
 
 impl MerkleTree {
@@ -43,80 +44,102 @@ impl MerkleTree {
         let mut tree = Self {
             root: MerkleNode::new("".to_string()),
             leaves: Vec::new(),
+            layers: Vec::new(),
         };
 
-        tree.build(&mut leaves);
         tree.leaves = leaves;
+        tree.build();
 
         tree
     }
 
+    fn get_tree_height(&self) -> usize {
+        let count = (2 * self.leaves.len() - 1) as f32;
+        count.log2().floor() as usize
+    }
+
     /// Builds the Merkle tree from a list of leaves. In case of an odd number of leaves, the last
     /// leaf is duplicated.
-    fn build(&mut self, leaves: &mut [MerkleNode] ) -> bool {
-        let nleaves = leaves.len();
-        if nleaves == 1 {
-            if let Some(leaf) = leaves.get(0) {
-                self.root = leaf.clone();
-                return true;
+    fn build(&mut self) {
+        let layer_count = self.get_tree_height();
+        let mut layers = vec![self.leaves.to_vec()];
+
+        for layer_index in 1..layer_count + 1 {
+            let mut layer = Vec::new();
+            let previous_layer = &layers[layer_index - 1];
+
+            for i in (0..previous_layer.len()).step_by(2) {
+                let left = &previous_layer[i];
+                let right = if i + 1 < previous_layer.len() {
+                    &previous_layer[i + 1]
+                } else {
+                    left
+                };
+
+                let parent = Self::create_parent(left, right);
+                layer.push(parent);
             }
+            layers.push(layer);
         }
 
-        let mut parents = Vec::new();
-
-        let mut i = 0;
-        while i < nleaves {
-            let (left, rest) = leaves.split_at_mut(i + 1);
-            let right = if i + 1 < nleaves {
-                rest.split_first_mut()
-            } else {
-                None
-            };
-
-            let right = match right {
-                Some((right, _)) => Some(right),
-                None => None,
-            };
-
-            let parent = Self::create_parent(Some(&mut left[i]), right);
-            parents.push(parent);
-
-            i += 2;
-        }
-
-        self.build(&mut parents)
+        layers.reverse();
+        self.layers = layers.clone();
+        self.root = layers[0][0].clone();
     }
 
     /// Creates the parent node from the children, and updates their parent field.
-    fn create_parent(left: Option<&mut MerkleNode>, right: Option<&mut MerkleNode>) -> MerkleNode {
+    fn create_parent(left: &MerkleNode, right: &MerkleNode) -> MerkleNode {
         let mut data = String::new();
-
-        match (&left, &right) {
-            (Some(left), Some(right)) => {
-                data.push_str(&left.hash);
-                data.push_str(&right.hash);
-            }
-            (Some(left), None) => {
-                data.push_str(&left.hash);
-                data.push_str(&left.hash);
-            }
-            _ => unreachable!(),
-        }
+        data.push_str(&left.hash);
+        data.push_str(&right.hash);
 
         let hash = <Sha256 as Digest>::digest(data);
         let res = hex::encode(hash);
 
-        let mut parent = MerkleNode::new(res.clone());
-        if let Some(left) = left {
-            left.parent = Some(Box::new(parent.clone()));
-            parent.left_child = Some(Box::new(left.clone()));
-        }
-        if let Some(right) = right {
-            right.parent = Some(Box::new(parent.clone()));
-            parent.right_child = Some(Box::new(right.clone()));
-        }
+        let parent = MerkleNode::new(res.clone());
 
         parent
+    }
+
+    pub fn generate_proof(&self, item: String) -> io::Result<Vec<MerkleNode>> {
+        let mut proof = Vec::new();
+        let Some(leaf_index) = self.leaves.iter().position(|e| e.hash == item) else {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "does not match any leaves",
+            ));
+        };
+
+        let mut current_index = Self::get_tree_nodes(self.layers.len() - 1) + leaf_index;
+
+        for layer_index in (1..self.layers.len()).rev() {
+            let layer = &self.layers[layer_index];
+            let internal_index = current_index - Self::get_tree_nodes(layer_index);
+            let sibling = if internal_index % 2 == 0 {
+                layer[internal_index + 1].clone()
+            } else {
+                layer[internal_index - 1].clone()
+            };
+            proof.push(sibling);
+
+            current_index = (current_index - 1) / 2;
+        }
+
+        Ok(proof)
+    }
+
+    fn get_tree_nodes(height: usize) -> usize {
+        (2usize).pow((height) as u32) - 1
+    }
+
+    pub fn verify_proof(&self, proof: Vec<MerkleNode>, leaf: String) -> bool {
+        let mut current = MerkleNode::new(leaf);
+
+        for elem in proof {
+            current = Self::create_parent(&current, &elem);
+        }
+
+        self.root.hash == current.hash
     }
 
     pub fn get_audit_trail(&self, chunk_hash: String) -> Vec<(String, bool)> {
@@ -200,13 +223,13 @@ mod tests {
         let hash = <Sha256 as Digest>::digest("0");
         let res = hex::encode(hash);
 
-        let audit_trail = tree.get_audit_trail(res);
+        let proof = tree.generate_proof(res.clone()).unwrap();
 
-        println!("Audit trail: {:?}", audit_trail);
+        assert!(tree.verify_proof(proof, res));
 
-        // assert_eq!(
-        //     tree.root.hash,
-        //     "e11a20bae8379fdc0ed560561ba33f30c877e0e95051aed5acebcb9806f6521f"
-        // );
+        let hash = <Sha256 as Digest>::digest("10");
+        let res = hex::encode(hash);
+
+        assert!(tree.generate_proof(res.clone()).is_err());
     }
 }
