@@ -5,9 +5,9 @@ use sha2::{Digest, Sha256};
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct MerkleNode {
     hash: String,
-    parent: Option<Rc<MerkleNode>>,
-    left_child: Option<Rc<MerkleNode>>,
-    right_child: Option<Rc<MerkleNode>>,
+    parent: Option<Box<MerkleNode>>,
+    left_child: Option<Box<MerkleNode>>,
+    right_child: Option<Box<MerkleNode>>,
 }
 
 impl MerkleNode {
@@ -40,19 +40,25 @@ impl MerkleTree {
             leaves.push(node);
         }
 
-        Self {
-            root: Self::build(&mut leaves),
-            leaves,
-        }
+        let mut tree = Self {
+            root: MerkleNode::new("".to_string()),
+            leaves: Vec::new(),
+        };
+
+        tree.build(&mut leaves);
+        tree.leaves = leaves;
+
+        tree
     }
 
     /// Builds the Merkle tree from a list of leaves. In case of an odd number of leaves, the last
     /// leaf is duplicated.
-    fn build(leaves: &mut [MerkleNode]) -> MerkleNode {
+    fn build(&mut self, leaves: &mut [MerkleNode]) -> bool {
         let nleaves = leaves.len();
         if nleaves == 1 {
             if let Some(leaf) = leaves.get(0) {
-                return leaf.clone();
+                self.root = leaf.clone();
+                return true;
             }
         }
 
@@ -72,12 +78,13 @@ impl MerkleTree {
                 None => None,
             };
 
-            parents.push(Self::create_parent(Some(&mut left[i]), right));
+            let parent = Self::create_parent(Some(&mut left[i]), right);
+            parents.push(parent);
 
             i += 2;
         }
 
-        Self::build(&mut parents)
+        self.build(&mut parents)
     }
 
     /// Creates the parent node from the children, and updates their parent field.
@@ -101,12 +108,12 @@ impl MerkleTree {
 
         let mut parent = MerkleNode::new(res.clone());
         if let Some(left) = left {
-            left.parent = Some(Rc::new(parent.clone()));
-            parent.left_child = Some(Rc::new(left.clone()));
+            left.parent = Some(Box::new(parent.clone()));
+            parent.left_child = Some(Box::new(left.clone()));
         }
         if let Some(right) = right {
-            right.parent = Some(Rc::new(parent.clone()));
-            parent.right_child = Some(Rc::new(right.clone()));
+            right.parent = Some(Box::new(parent.clone()));
+            parent.right_child = Some(Box::new(right.clone()));
         }
 
         parent
@@ -131,6 +138,8 @@ impl MerkleTree {
     ) -> Vec<(String, bool)> {
         let mut count = 0;
         count += 1;
+
+        println!("Merkle node: {merkle_node:?}");
 
         if merkle_node == &self.root {
             trail.push((merkle_node.hash.clone(), true));
