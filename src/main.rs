@@ -23,7 +23,7 @@ async fn main() -> anyhow::Result<()> {
 
     let start_slot = 0;
     let limit = 3;
-    let mut rewards = Vec::new();
+    let mut rewards: Vec<String> = Vec::new();
 
     loop {
         let end_slot = start_slot + ONE_EPOCH;
@@ -44,8 +44,11 @@ async fn main() -> anyhow::Result<()> {
                 .await
                 .context("get confirmed blocks")?;
 
-            let leader_pubkeys = confirmed_block.rewards.iter().map(|r| r.pubkey).collect();
-            
+            let leader_pubkeys: Vec<&str> = confirmed_block
+                .rewards
+                .iter()
+                .map(|r| r.pubkey.as_str())
+                .collect();
         }
 
         if end_slot > latest_slot {
