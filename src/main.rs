@@ -1,7 +1,7 @@
 use anyhow::Context;
 use dotenv::dotenv;
+use lantern::MerkleTree;
 use solana_client::nonblocking::rpc_client::RpcClient;
-use tokio::net::TcpListener;
 
 const ONE_EPOCH: u64 = 432_000;
 
@@ -21,12 +21,12 @@ async fn main() -> anyhow::Result<()> {
 
     // eprintln!("Vote accounts: {}", vote_accounts.current.len());
 
-    let start_slot = 0;
-    let limit = 3;
-    let mut rewards: Vec<String> = Vec::new();
+    let limit = latest_slot / ONE_EPOCH;
+    let mut roots = Vec::new();
 
-    loop {
-        let end_slot = start_slot + ONE_EPOCH;
+    for epoch in 0..limit {
+        let start_slot = epoch * ONE_EPOCH;
+        let end_slot = ((epoch + 1) * ONE_EPOCH) - 1;
 
         let confirmed_blocks = rpc_client
             .get_blocks(start_slot, Some(end_slot))
@@ -38,18 +38,23 @@ async fn main() -> anyhow::Result<()> {
             confirmed_blocks.len()
         );
 
+        let mut leaders: Vec<String> = Vec::new();
         for confimed_blockn in confirmed_blocks {
             let confirmed_block = rpc_client
                 .get_block(confimed_blockn)
                 .await
                 .context("get confirmed blocks")?;
 
-            let leader_pubkeys: Vec<&str> = confirmed_block
+            let leader_pubkeys: Vec<String> = confirmed_block
                 .rewards
                 .iter()
-                .map(|r| r.pubkey.as_str())
+                .map(|r| r.pubkey.clone())
                 .collect();
+            leaders.extend(leader_pubkeys);
         }
+
+        let tree = MerkleTree::new(leaders);
+        roots.push(tree.root.hash);
 
         if end_slot > latest_slot {
             break;

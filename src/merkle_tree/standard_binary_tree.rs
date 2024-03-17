@@ -4,7 +4,7 @@ use sha2::{Digest, Sha256};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MerkleNode {
-    hash: String,
+    pub hash: String,
     parent: Option<Box<MerkleNode>>,
     left_child: Option<Box<MerkleNode>>,
     right_child: Option<Box<MerkleNode>>,
@@ -24,7 +24,7 @@ impl MerkleNode {
 
 #[derive(Debug)]
 pub struct MerkleTree {
-    root: MerkleNode,
+    pub root: MerkleNode,
     leaves: Vec<MerkleNode>,
     layers: Vec<Vec<MerkleNode>>,
 }
@@ -198,11 +198,8 @@ mod tests {
     use super::*;
 
     fn construct_merkletree() -> MerkleTree {
-        let chunks = vec!["0", "1", "2", "3", "4", "5", "6", "7"]
-            .iter_mut()
-            .map(|chunk| chunk.to_string())
-            .collect();
-
+        let chunks = vec!["0", "1", "2", "3", "4", "5", "6", "7"];
+        let chunks = chunks.into_iter().map(|chunk| chunk.to_string()).collect();
         MerkleTree::new(chunks)
     }
 
