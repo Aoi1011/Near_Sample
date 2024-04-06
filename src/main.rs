@@ -5,6 +5,7 @@ use dotenv::dotenv;
 use lantern::MerkleTree;
 use rocksdb::DB;
 use solana_client::nonblocking::rpc_client::RpcClient;
+use tokio::task::JoinSet;
 
 const ONE_EPOCH: u64 = 432_000;
 
@@ -26,14 +27,15 @@ async fn main() -> anyhow::Result<()> {
     // eprintln!("Vote accounts: {}", vote_accounts.current.len());
 
     let limit = latest_slot / ONE_EPOCH;
-    let mut handles = Vec::new();
+    // let mut handles = Vec::new();
+    let mut set = JoinSet::new();
     for epoch in 0..limit {
         let start_slot = epoch * ONE_EPOCH;
         let end_slot = ((epoch + 1) * ONE_EPOCH) - 1;
 
         let db = db.clone();
         let rpc_client = rpc_client.clone();
-        let handle = tokio::spawn(async move {
+        set.spawn(async move {
             let confirmed_blocks = rpc_client
                 .get_blocks(start_slot, Some(end_slot))
                 .await
@@ -69,12 +71,17 @@ async fn main() -> anyhow::Result<()> {
                 .expect("put info");
         });
 
-        handles.push(handle);
+        // handles.push(handle);
+        // set.spawn(handle);
     }
 
-    for handle in handles {
-        handle.await.unwrap();
+    while let Some(res) = set.join_next().await {
+        res.unwrap();
     }
+
+    // for handle in handles {
+    //     handle.await.unwrap();
+    // }
 
     // let block = rpc_client.get_block(0).await.context("get block")?;
 
